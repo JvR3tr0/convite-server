@@ -2,6 +2,11 @@ import express from "express";
 import bodyParser from "body-parser";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import cors from 'cors';
+
+app.use(cors({
+  origin: '*' // Para liberar acesso de qualquer origem (frontend)
+}));
 
 dotenv.config();
 const app = express();
@@ -47,3 +52,4 @@ app.post("/confirmar", async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+
