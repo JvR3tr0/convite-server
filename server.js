@@ -1,17 +1,14 @@
 import express from "express";
+import cors from "cors"; // IMPORTAR cors
 import bodyParser from "body-parser";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import cors from "cors";
-
-app.use(cors({
-  origin: '*' // Para liberar acesso de qualquer origem (frontend)
-}));
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors()); // USAR cors para liberar requisições cross-origin
 app.use(bodyParser.json());
 
 // Rota para confirmar presença
@@ -52,5 +49,6 @@ app.post("/confirmar", async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+
 
 
