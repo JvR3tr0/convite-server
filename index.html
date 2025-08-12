@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Convite Coconista — PDF em 1 página</title>
 
-<!-- estilos visuais da página -->
+
 <style>
   :root{
     --a4-w-mm: 210mm;
@@ -66,8 +66,6 @@
   }
   .btn:hover{ background:#b88944; }
 
-  /* ------------ ÁREA QUE SERÁ USADA PARA GERAR O PDF (A4) ------------ */
-  /* colocamos essa área fora da tela (assim não fica visível), mas renderizável */
   #pdfArea{
     position: absolute;
     left: -9999px;   /* fora da tela, mas visível para render */
@@ -80,10 +78,10 @@
     border: 8px double #d4a056;
     border-radius: 12px;
     color: #3b2f2f;
-    overflow: hidden; /* garantir sem overflow */
+    overflow: hidden; 
     display: block;
   }
-  /* Estilo interno do PDF (ajustado para caber numa página A4) */
+  
   .pdf-header{
     display:flex;
     align-items:center;
@@ -121,10 +119,8 @@
     color:#533f36;
   }
 
-  /* QR code dentro do PDF */
   #pdf-qr{ width:110px; height:110px; border:6px solid #fff; background:#fff; padding:6px; box-shadow:0 4px 8px rgba(0,0,0,0.12); }
 
-  /* se quiser que o iframe continue na página normal (para usuário ver) */
   .maps-frame{ width:100%; height:320px; border-radius:10px; border:0; }
 </style>
 </head>
@@ -136,7 +132,6 @@
 </header>
 
 <div class="page-wrap">
-  <!-- Conteúdo normal visível na web -->
   <section class="card">
     <h2>📅 Data e Hora</h2>
     <p>17 de Agosto de 2025 — 11:00</p>
@@ -164,7 +159,6 @@
   <section class="card">
     <h2>📍 Localização (visual no site)</h2>
     <p>Gama — Brasília, DF</p>
-    <!-- mantemos o iframe apenas para visualização na página; NÃO será capturado pelo PDF -->
     <iframe class="maps-frame"
       src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1917.836535729784!2d-48.2046674!3d-15.9784404!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x935bd72619f7b693%3A0x8b61fbf6b3794ceb!2sGama%2C%20Bras%C3%ADlia%20-%20DF!5e0!3m2!1spt-BR!2sbr!4v1755018874830!5m2!1spt-BR!2sbr"
       loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
@@ -176,7 +170,6 @@
   </div>
 </div>
 
-<!-- ------------ AREA A4 PARA GERAR O PDF (NÃO VISIBLE NA TELA) ------------ -->
 <div id="pdfArea" aria-hidden="true">
   <div class="pdf-header">
     <div class="selo">🥥</div>
@@ -214,8 +207,6 @@
         Link: <span id="pdfMapLink">https://www.google.com/maps/search/?api=1&query=Gama+Brasilia+DF</span>
       </p>
     </div>
-
-    <!-- QR dinâmico (será gerado por JS) -->
     <div id="pdf-qr" aria-hidden="false"></div>
   </div>
 
@@ -231,11 +222,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script>
-  // Função utilitária para gerar QR no elemento #pdf-qr
   function gerarQRCodeEmElemento(url) {
     const el = document.getElementById('pdf-qr');
     el.innerHTML = ''; // limpar se já tiver
-    // QRCode (qrcodejs) gera uma <img> ou <table> automaticamente
+    
     new QRCode(el, {
       text: url,
       width: 110,
@@ -245,25 +235,19 @@
       correctLevel: QRCode.CorrectLevel.H
     });
   }
-
-  // Gera PDF em UMA única página A4 (captura #pdfArea como imagem)
   async function gerarPDFA4_unica(nomeArquivo = 'convite-coconista.pdf') {
-    // mapa (link) — adapte se quiser coordenadas exatas
     const endereco = 'Gama, Brasília, DF';
     const mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(endereco);
-
-    // atualizar link visível no pdf e gerar QR
     document.getElementById('pdfMapLink').textContent = mapUrl;
     gerarQRCodeEmElemento(mapUrl);
-
-    // pegamos o elemento que já tem tamanho A4 (em mm via CSS)
+    
     const pdfArea = document.getElementById('pdfArea');
 
-    // small delay para garantir QR renderizado
+    
     await new Promise(r => setTimeout(r, 350));
 
-    // usar html2canvas para gerar um canvas do A4; scale maior => melhor resolução
-    const scale = 3; // aumenta qualidade (3 = bom). Ajuste se lento.
+   
+    const scale = 3; 
     const canvas = await html2canvas(pdfArea, {
       scale: scale,
       useCORS: true,
@@ -271,10 +255,10 @@
       logging: false
     });
 
-    // transformar em imagem
+    
     const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
-    // criar jsPDF e colocar a imagem como UMA página inteira (com margens)
+    
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
 
@@ -282,18 +266,18 @@
     const pageHeight = 297;
     const margin = 10; // mm
 
-    // adiciona imagem cobrindo a área central respeitando margens
+    
     pdf.addImage(imgData, 'JPEG', margin, margin, pageWidth - margin * 2, pageHeight - margin * 2);
     pdf.save(nomeArquivo);
   }
 
-  // Botões
+  
   document.getElementById('gerarBtn').addEventListener('click', function(){
     gerarPDFA4_unica('convite-coconista.pdf')
       .catch(err => { console.error(err); alert('Erro ao gerar PDF: ' + err.message); });
   });
 
-  // exemplo de botão simples que gera sem QR (apenas outra variação)
+ 
   document.getElementById('baixarSimples').addEventListener('click', function(){
     gerarPDFA4_unica('convite-coconista-simples.pdf');
   });
@@ -304,5 +288,6 @@
 </body>
 
 </html>
+
 
 
